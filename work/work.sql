@@ -102,6 +102,10 @@ FROM customer
 SELECT 
 	customer_id, 
 	email AS Email,
-	INITCAP(SPLIT_PART(email, '@', 1)) AS "Email before @",
-	INITCAP(SPLIT_PART(email, '@', 2)) AS "Email after @"
-FROM customer 
+	OVERLAY(
+		SPLIT_PART(email, '@', 1) placing UPPER(LEFT(SPLIT_PART(email, '@', 1), 1)) from 1 for 1
+	) AS "Email before @",
+	OVERLAY(
+		SPLIT_PART(email, '@', 2) placing UPPER(LEFT(SPLIT_PART(email, '@', 2), 1)) from 1 for 1
+	) AS "Email after @"
+FROM customer
