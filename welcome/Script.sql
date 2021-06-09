@@ -1,7 +1,7 @@
-select tc.constraint_name, c.data_type 
-from information_schema.table_constraints as tc
-	left join information_schema.key_column_usage as kcu
-	on tc.constraint_name = kcu.constraint_name 
-	left join information_schema.columns as c
-	on kcu.table_name = c.table_name and kcu.column_name = c.column_name
-where tc.constraint_type = 'PRIMARY KEY'
+SELECT tc.constraint_name, c.data_type 
+FROM information_schema.table_constraints AS tc
+	LEFT JOIN information_schema.key_column_usage AS kcu
+	ON tc.constraint_name = kcu.constraint_name 
+	LEFT JOIN information_schema.columns AS c
+	ON kcu.table_name = c.table_name AND kcu.column_name = c.column_name
+WHERE tc.constraint_type = 'PRIMARY KEY'
