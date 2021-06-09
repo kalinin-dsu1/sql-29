@@ -58,7 +58,7 @@ FROM customer
 --Все буквы в фамилии и имени из нижнего регистра должны быть переведены в высокий регистр.
 
 SELECT UPPER(last_name), UPPER(first_name) FROM customer
-WHERE first_name IN ('Kelly','Willie')
+WHERE first_name IN ('Kelly','Willie') and active = 1
 
 
 
