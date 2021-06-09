@@ -27,7 +27,7 @@ WHERE district LIKE 'K%a' AND NOT district LIKE '% %'
 --Платежи нужно отсортировать по дате платежа.
 
 SELECT payment_id, payment_date, amount FROM payment 
-WHERE amount > 1 AND payment_date BETWEEN '2007-03-17' AND '2007-03-19 23:59:59'
+WHERE amount > 1 AND payment_date::date BETWEEN '2007-03-17' AND '2007-03-19'
 ORDER BY payment_date 
 
 
