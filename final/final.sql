@@ -71,12 +71,12 @@ select
 		else 'Нет'
 	end
 from (
-	select 1
+	select *
 	from bookings b
 	left join tickets t using(book_ref)
 	left join boarding_passes bp
 	on t.ticket_no = bp.ticket_no
-	where bp.ticket_no=bp.ticket_no
+	where bp.ticket_no is null
 	limit 1
 ) sq
 
@@ -104,10 +104,10 @@ select
 	departure_airport_name,
 	scheduled_departure::date,
 	boarded,
-	round(100 * boarded / count) as boarded_percent,
+	round(100 * (1 - (boarded::float / count))) as boarded_percent,
 	sum(boarded) over(
 		partition by departure_airport_name, scheduled_departure::date
-		order by departure_airport_name, scheduled_departure::date
+		order by departure_airport_name, scheduled_departure
 	) as boarded_total
 from (
 	select 
@@ -148,25 +148,33 @@ from (
 -- 2) Джойним СТЕ само на себя по id перелета, выбрав в левой части все эконом перелеты а в правой все бизнес перелеты
 -- 3) фильтруем по условию(цена за эконом выше цены за бизнес)
 -- 4) Оборачиваем в подзапрос для выведения строкового ответа
-with cte as (
-	select min(amount), flight_id, fare_conditions
-	from ticket_flights
-	where fare_conditions in ('Business', 'Economy')
-	group by flight_id, fare_conditions 
-)
+with 
+	cte_e_max as (
+		select max(amount), flight_id
+		from ticket_flights
+		where fare_conditions = 'Economy'
+		group by flight_id
+	),
+	cte_b_min as (
+		select min(amount), flight_id
+		from ticket_flights
+		where fare_conditions = 'Business'
+		group by flight_id
+	)	
 select 
 	case 
 		when count(*)>0 then 'Да'
 		else 'Нет'
 	end
 from (
-	select cte1.min, cte2.min, cte1.flight_id
-	from cte as cte1
-	join cte as cte2
-	on cte1.flight_id = cte2.flight_id
-	and cte1.fare_conditions = 'Economy'
-	and cte2.fare_conditions = 'Business'
-	and cte1.min > cte2.min
+	select 
+		cte_e_max.max, 
+		cte_b_min.min, 
+		cte_e_max.flight_id
+	from cte_e_max
+	join cte_b_min
+	on cte_e_max.flight_id = cte_b_min.flight_id
+	and cte_e_max.max > cte_b_min.min
 ) sq
 
 
