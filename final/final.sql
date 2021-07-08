@@ -103,8 +103,8 @@ select
 	flight_no,
 	departure_airport_name,
 	scheduled_departure::date,
-	boarded,
-	round(100 * (1 - (boarded::float / count))) as boarded_percent,
+	count - boarded as free_seats,
+	round(100 * (1 - (boarded::float / count))) as free_percent,
 	sum(boarded) over(
 		partition by departure_airport_name, scheduled_departure::date
 		order by departure_airport_name, scheduled_departure
